@@ -17,7 +17,7 @@ def eye_aspect_ratio(eye):
 
 def sleepdetect(frame, EYE_CLOSED_COUNTER):
     FACIAL_LANDMARK_PREDICTOR = "shape_predictor_68_face_landmarks.dat"  
-    MINIMUM_EAR = 0.2
+    MINIMUM_EAR = 0.35
     # 임계값은 0.2로 설정
     MAXIMUM_FRAME_COUNT = 10
 

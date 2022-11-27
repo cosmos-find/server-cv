@@ -17,15 +17,6 @@ from aiortc import sdp
 import cv2
 import numpy as np
 
-WEBOS_SERVICE_URL = "http://10.50.20.201:9000"
-IOT_SERVER_URL = "http://10.50.20.167:9002"
-
-ID_ROOM_0 = "ROOM0"
-ID_ROOM_1 = "ROOM1"
-ID_ROOM_2 = "ROOM2"
-ID_ROOM_3 = "ROOM3"
-current_room = ""
-
 rtcIceServer = RTCIceServer("stun:stun.l.google.com:19302")
 configuration = RTCConfiguration()
 configuration.iceServers = [rtcIceServer]
@@ -139,11 +130,12 @@ async def show_stream(recorder):
                         continue
                     elif (type(result) == str):
                         idcheck = {
-                            'message' : f"{result} 님 환영합니다."
+                            'username' : result
                         }
-                        res = requests.post(f'{WEBOS_SERVICE_URL}/CreateToast',json = idcheck)
+                        res = requests.post('http://localhost:9999/User',json = idcheck)
                         print(res.status_code)
                         print(res.json())
+
                         break
                     np.save('frame.npy', frame)
                 await asyncio.sleep(2)
@@ -163,14 +155,11 @@ async def show_stream(recorder):
                         num1 += 1
                         if(num1 >= 5):
                             print('제 1공간')
-                            current_room = ID_ROOM_1
                     
                     if(result == 1):
                         num2 += 1
                         if(num2 >= 5):
                             print('제 2공간')
-                            current_room = ID_ROOM_1
-
                     np.save('frame.npy', frame)
 
                 await asyncio.sleep(2)
@@ -182,13 +171,12 @@ async def show_stream(recorder):
                 if frame is not None:
                     result =  posturedetect.production(frame)
                     sum += 1
-                    if result is not None:
-                        data = {
-                            "message" : "무릎 나오지 않게 해주세요."
-                        }
-                        res = requests.post(f'{WEBOS_SERVICE_URL}/CreateTTS',json=data)
-                        print(res.status_code)
-                        print(res.json())
+                    posturecheck = {
+                            'statement' : result
+                    }
+                    res = requests.post('http://localhost:9999/User',json = posturecheck)
+                    print(res.status_code)
+                    print(res.json())
                     if sum > 10:
                         break
                     
@@ -209,12 +197,10 @@ async def show_stream(recorder):
                         print(EYE_CLOSED_COUNTER)
                         EYE_CLOSED_COUNTER += 1
                     if(type(result) == str):
-                        user_context = {
-                            "isExercising": False,
-                            "isSleeping" : True,
-                            "location" : current_room,
+                        eye_state = {
+                            'sleepornot' : result
                         }
-                        res = requests.patch(f'{IOT_SERVER_URL}/UserContext',json=user_context)
+                        res = requests.post('http://localhost:9999/User',json = eye_state)
                         print(res.json())
                         break
 
@@ -230,6 +216,8 @@ async def main(recorder):
     await asyncio.wait([task1, task2])
 
 if __name__ == '__main__':
+
+    # recorder = MediaRecorder('video.mp4')
     recorder = MyVideoHandler('video.mp4')
     
     # run event loop

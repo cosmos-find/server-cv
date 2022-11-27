@@ -55,6 +55,12 @@ def production(frame):
         if num1 and num2:
             if abs(num1[1] - num2[1])>= 30:
                 print("팔일자!!")
+
+    def kneeankle(num1, num2):
+        if num1 and num2:
+            if (num1[0] - num2[0])>= 20:
+                print("무릎 집어넣으세요")
+                return 10
                 
 
     for i in range(0,15):
@@ -76,7 +82,7 @@ def production(frame):
     
 
     statement = turtleNeck(points[0],points[1])
-    if statement == 10:
-        neck = "Turtle Neck"
-        return neck
-
+    statement2 = kneeankle(points[9], points[10])
+    if statement2 == 10:
+        knee = "front knee"
+        return knee
